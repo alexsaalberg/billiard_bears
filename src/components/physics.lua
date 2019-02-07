@@ -16,7 +16,7 @@ function component:setVelocity(x, y)
 end
 
 function component:toInfo()
-	local vx, vy = self.body:getVelocity()
+	local vx, vy = self.body:getLinearVelocity()
 	local x, y = self.body:getPosition()
 
 	return "Physics Component"

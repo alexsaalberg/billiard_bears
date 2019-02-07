@@ -1,6 +1,7 @@
 Position = require 'src.components.position'
+Animal = require 'src.components.animal'
 
-local system = Concord.system({Physics})
+local system = Concord.system({Physics, "allPool"}, {Physics, Animal, 'animalPool'})
 
 function system:init(world)
 	self.world = world
@@ -15,6 +16,15 @@ end
 
 function system:update(dt)
 	self.world:update(dt)
+
+	for i = 1, self.animalPool.size do
+		e = self.animalPool:get(i)
+		physics = e:get(Physics)
+
+		if love.keyboard.isDown( 'r' ) then
+			system.resetBody(physics.body)
+		end
+	end
 end
 
 function system:draw()
@@ -67,6 +77,23 @@ local function postSolve(a, b, coll, normalimpulse, tangentimpulse)
 end
 
 --[[ static functions ]]
+function system.resetBodies(world)
+	for _, body in pairs(world:getBodies()) do
+		body:setPosition(system.randomPosition())
+		body:setLinearVelocity(50, 50)
+	end
+end
+
+lume = require( 'lib.lume' )
+function system.resetBody(body)
+	body:setPosition(system.randomPosition())
+	body:setLinearVelocity(lume.random(-50, 100), 0)
+end
+
+function system.randomPosition()
+  local border = 50
+  return lume.random(border, love.graphics.getWidth() - border), 150--lume.random(border, love.graphics.getHeight())
+end
 
 function system.makeCircleBody(world, userdata, options)
 	if not options then

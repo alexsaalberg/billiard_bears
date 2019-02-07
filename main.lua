@@ -7,6 +7,7 @@ Concord = require("lib.concord").init({
 local Position = require 'src.components.position'
 local Physics = require 'src.components.physics'
 local Image = require 'src.components.image'
+local AnimalComponent = require 'src.components.animal'
 local DrawSystem = require 'src.systems.draw'
 local PhysicsSystem = require 'src.systems.physics'
 local DebugSystem = require 'src.systems.debug'
@@ -21,16 +22,22 @@ gameInstance = Concord.instance()
 
 --[[ love callbacks ]]
 function love.load()
-   -- Resources
+   -- Settings
+
+   --love.window.setMode(800,600, {display=2})
+   love.window.setMode(600, 400, {display=2})
+
+
+   -- Load Resources
    Resources.Graphics.Bear = love.graphics.newImage( 'resources/graphics/bear.png' )
    Resources.Graphics.Felt = love.graphics.newImage( 'resources/graphics/felt.png' )
    Resources.Audio.ball_clack = love.audio.newSource( 'resources/audio/ball_clack.ogg', 'static' )
 
-   -- Physics
+   -- Create Physics World
    game = {}
    game.world = love.physics.newWorld(0, 0, true)
 
-   -- Systems
+   -- Instantiate Systems
    drawSystem = DrawSystem()
    gameInstance:addSystem(drawSystem, 'draw')
 
@@ -44,7 +51,7 @@ function love.load()
 
    --gameInstance:addSystem(physicsSystem, 'keypressed')
 
-   -- Adding entities
+   -- Create Background Entity
    local background = Concord.entity()
    background:give(Position)
    background:give(Image, Resources.Graphics.Felt)
@@ -52,17 +59,18 @@ function love.load()
 
    gameInstance:addEntity(background)
 
-
+   -- Create Animal Entities
    local randomPosition = function()
       lume = require( 'lib.lume' )
-      return lume.random(30,300), lume.random(30, 300)
+      return lume.random(30,70), lume.random(30, 70)
    end
 
-   for i = 1,2 do
+   for i = 1, 2 do
       local ballBody, ballShape = physicsSystem.makeCircleBody(game.world)
       local entity = Concord.entity()
       entity:give(Physics, ballBody, ballShape)
       entity:give(Image, Resources.Graphics.Bear)
+      entity:give(AnimalComponent, "bear")
       entity:apply()
 
       entity[Physics]:setPosition(randomPosition())
